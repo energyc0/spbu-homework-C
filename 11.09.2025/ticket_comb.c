@@ -16,9 +16,9 @@ int count_combinations(int freq[28])
     return res;
 }
 
-int main(void) 
+int main(void)
 {
-    int freq[28] = {0};
+    int freq[28] = { 0 };
     count_numbers_freq(freq);
     printf("%d\n", count_combinations(freq));
     return 0;

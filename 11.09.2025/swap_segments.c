@@ -40,7 +40,7 @@ void vectorPushBack(struct Vector* v, int val)
     v->data[v->size++] = val;
 }
 
-void pushUserNumbers(struct Vector* v) 
+void pushUserNumbers(struct Vector* v)
 {
     char buf[BUFSIZ];
     printf("Enter numbers:\n");
@@ -74,10 +74,11 @@ int getNum()
 
 void swapSegments(int* data, int n, int m)
 {
-    #define swap(a,b) do { \
+#define swap(a, b)          \
+    do {                    \
         typeof(a) temp = a; \
-        a = b; \
-        b = temp; \
+        a = b;              \
+        b = temp;           \
     } while (0)
     const int len = n + m;
 
@@ -95,7 +96,7 @@ void swapSegments(int* data, int n, int m)
             swap(data[i], data[j]);
     }
 
-    #undef swap
+#undef swap
 }
 
 int main(void)

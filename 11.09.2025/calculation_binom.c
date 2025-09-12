@@ -1,6 +1,7 @@
 #include <stdio.h>
 
-int calculation_binom(int x) {
+int calculation_binom(int x)
+{
     int xx = x * x;
     return (xx + x) * (xx + 1) + 1;
 }

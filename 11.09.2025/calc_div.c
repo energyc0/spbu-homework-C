@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define errQuit(msg) do { \
-        fprintf(stderr, msg);\
-        putc('\n', stderr); \
-        exit(EXIT_FAILURE);\
-    } while (0) 
+#define errQuit(msg)          \
+    do {                      \
+        fprintf(stderr, msg); \
+        putc('\n', stderr);   \
+        exit(EXIT_FAILURE);   \
+    } while (0)
 
 int calculateDivision(int a, int b)
 {
@@ -22,11 +23,11 @@ int calculateDivision(int a, int b)
     return res * sign + (a > 0 && sign == -1 ? -1 : 0);
 }
 
-int getNum() 
+int getNum()
 {
     int num;
     printf("Enter a number: ");
-    if (scanf("%d", &num) != 1) 
+    if (scanf("%d", &num) != 1)
         errQuit("Expected a number");
     return num;
 }
@@ -35,7 +36,7 @@ int main(void)
 {
     int a = getNum();
     int b = getNum();
-    printf("Result: %d\n", calculateDivision(a,b));
+    printf("Result: %d\n", calculateDivision(a, b));
 
     return 0;
 }
