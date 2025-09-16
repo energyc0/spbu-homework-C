@@ -13,11 +13,11 @@ int countZeros(const int* arr, int size)
     return k;
 }
 
-int main(void) 
+int main(void)
 {
-    int a[] = {1, 2, 0, 4, 5, 0};
-    int b[] = {8, 13, -1, 4, 0};
-    int c[] = {4, 3, 1};
+    int a[] = { 1, 2, 0, 4, 5, 0 };
+    int b[] = { 8, 13, -1, 4, 0 };
+    int c[] = { 4, 3, 1 };
 
     printf("%d\n", countZeros(a, ARRAY_SIZE(a)));
     printf("%d\n", countZeros(b, ARRAY_SIZE(b)));

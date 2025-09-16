@@ -25,7 +25,7 @@ void printOutput(const char* str)
     printf("isClosedBraces(%s) = %d\n", str, isClosedBraces(str));
 }
 
-int main() 
+int main()
 {
     printOutput("()()((()()))");
     printOutput("(0()))");
