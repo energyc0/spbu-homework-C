@@ -1,51 +1,16 @@
+#include <stdbool.h>
 #include <stdio.h>
 
-/*
- * 1    - braces are closed
- * 0    - braces are not closed
- * -1   - undefined character or unknown brace
- */
-
-int isClosedBraces(const char* str)
+bool isClosedBraces(const char* str)
 {
-    char start;
-    char end;
-    switch (str[0]) {
-    case '(':
-        start = '(';
-        end = ')';
-        break;
-    case '[':
-        start = '[';
-        end = ']';
-        break;
-    case '{':
-        start = '{';
-        end = '}';
-        break;
-    case '<':
-        start = '<';
-        end = '>';
-        break;
-    case ')':
-    case ']':
-    case '}':
-    case '>':
-        return 0;
-    case '\0':
-        return 1;
-    default:
-        return -1;
-    }
-
     int k = 0;
     for (const char* p = str; *p != '\0'; p++) {
-        if (*p == start) {
+        if (*p == '(') {
             k++;
-        } else if (*p == end) {
-            --k;
+        } else if (*p == ')') {
+            k--;
             if (k < 0)
-                return -1;
+                return false;
         }
     }
     return k == 0;
@@ -53,15 +18,15 @@ int isClosedBraces(const char* str)
 
 void printOutput(const char* str)
 {
-    printf("isClosedBraces(\"%s\") = %d\n", str, isClosedBraces(str));
+    printf("isClosedBraces(\"%s\") = %s\n",
+        str,
+        isClosedBraces(str) ? "true" : "false");
 }
 
 int main()
 {
-    printOutput("()()((()()))");
-    printOutput("(0()))");
-    printOutput("<><><");
-    printOutput("][][");
-    printOutput("[][[[]]]");
-    printOutput("{}{{}}");
+    printOutput("ab(cd)e)");
+    printOutput("if () else ");
+    printOutput("(1 + 2 * (3-1))");
+    printOutput("(1 + 2");
 }
