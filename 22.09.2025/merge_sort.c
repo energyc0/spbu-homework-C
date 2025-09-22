@@ -5,7 +5,11 @@
 #define BUFFER_CAPACITY (100)
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
 
-int scanNumbers(int* arr, int capacity) 
+/*
+ * Reads integers until newline in array 'arr'
+ * of size 'capacity', returns the number of integers
+ */
+int scanNumbers(int* arr, int capacity)
 {
     char buf[BUFSIZ];
     printf("Enter numbers:\n");
@@ -19,10 +23,14 @@ int scanNumbers(int* arr, int capacity)
         arr[size++] = num;
         offset += number_offset;
     }
-    
+
     return size;
 }
 
+/*
+ * Sorts given array and prints the result,
+ * outputs count of the replaced elements
+ */
 int printSortedArray(const int* arr, int size)
 {
     int temp_buf[size];

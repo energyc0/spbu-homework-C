@@ -1,6 +1,9 @@
 #include "sorter.h"
 #include <string.h>
 
+/*
+ * Merge two arrays into one using temporary space
+ */
 void _merge(int* arr, int left_size, int right_size)
 {
     const int size = left_size + right_size;
@@ -9,14 +12,14 @@ void _merge(int* arr, int left_size, int right_size)
 
     int l = 0;
     int r = left_size;
-    for(int i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) {
         if (l < left_size && r < size) {
             if (buf[l] < buf[r])
                 arr[i] = buf[l++];
             else
                 arr[i] = buf[r++];
         } else {
-            if (l < left_size) 
+            if (l < left_size)
                 arr[i] = buf[l++];
             else
                 arr[i] = buf[r++];
@@ -24,6 +27,9 @@ void _merge(int* arr, int left_size, int right_size)
     }
 }
 
+/*
+ * mergeSort() implementation
+ */
 void _mergeSortImpl(int* arr, int size)
 {
     if (size <= 1)
@@ -32,12 +38,14 @@ void _mergeSortImpl(int* arr, int size)
     int mid = size / 2;
     _mergeSortImpl(arr, mid);
     _mergeSortImpl(arr + mid, size - mid);
-    
+
     _merge(arr, mid, size - mid);
 }
 
+/*
+ * Sorts array 'arr' of integers of size 'size'
+ */
 void mergeSort(int* arr, int size)
 {
     _mergeSortImpl(arr, size);
-    
 }
