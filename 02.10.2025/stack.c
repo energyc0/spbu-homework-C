@@ -1,8 +1,6 @@
 #include "stack.h"
 #include <stdio.h>
 
-#define STACK_BASE_CAPACITY 16
-
 typedef struct StackNode {
     int val;
     struct StackNode* prev;
@@ -34,7 +32,7 @@ Stack* stackAlloc()
     return ptr;
 }
 
-void stackFree(Stack* st) 
+void stackFree(Stack* st)
 {
     StackNode* ptr = st->_data;
     while (ptr != NULL) {
