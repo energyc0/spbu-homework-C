@@ -57,7 +57,7 @@ int main(void)
     if (fgets(buf, sizeof(buf), stdin) == NULL)
         return 0;
 
-    buf[strlen(buf) - 1] = '\0';
+    buf[strcspn(buf, "\n")] = '\0';
     int res = checkBraceBalance(buf);
     if (res == -1)
         return 1;
