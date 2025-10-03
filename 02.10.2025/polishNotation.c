@@ -2,7 +2,13 @@
 #include <stdio.h>
 #include <ctype.h>
 
-#define eprintf(...) fprintf(stderr, __VA_ARGS__)
+/*
+ * Print error and assign *pExitCode = 1
+ */
+#define eprintf(pExitCode, ...) do { \
+    fprintf(stderr, __VA_ARGS__); \
+    *pExitCode = 1; \
+} while(0)
 
 static int _putback = '\0';
 static char _outputBuf[BUFSIZ];
@@ -22,15 +28,12 @@ int getInput()
     return ch;
 }
 
-bool putOutput(int ch)
+void putOutput(int ch)
 {
-    if (_outputBufSize >= (int)(sizeof(_outputBuf) - 2))
-        return false;
-
-    _outputBuf[_outputBufSize++] = ch;
-    _outputBuf[_outputBufSize++] = ' ';
-
-    return true;
+    if (_outputBufSize < (int)(sizeof(_outputBuf) - 2)) {
+        _outputBuf[_outputBufSize++] = ch;
+        _outputBuf[_outputBufSize++] = ' ';
+    }
 }
 
 void printOutput()
@@ -71,14 +74,16 @@ int getOpPrec(int op)
 /*
  * Pops all the operations from 'opStack' until '('.
  * Return false and print error message if '(' is not found.
+ * pExitCode must be initialized.
+ * *pExitCode = 1 on errors occured.
  */
-bool processClosedBrace(Stack* opStack)
+bool processClosedBrace(Stack* opStack, int* pExitCode)
 {
     while (!stackEmpty(opStack) && stackPeek(opStack) != '(')
         putOutput(stackPop(opStack));
 
     if (stackEmpty(opStack)) {
-        eprintf ("Missing '('\n");
+        eprintf (pExitCode, "Missing '('\n");
         return false;
     }
 
@@ -93,7 +98,7 @@ bool processClosedBrace(Stack* opStack)
  * Prints error messages.
  * Pops and prints all the operation with lower precedence.
 */
-bool processOp(Stack* opStack, int* exit_code)
+bool processOp(Stack* opStack, int* pExitCode)
 {
     int op = getInput();
     int prec = getOpPrec(op);
@@ -101,8 +106,8 @@ bool processOp(Stack* opStack, int* exit_code)
         if (isEOF(op))
             return false;
         if (op == ')')
-            return processClosedBrace(opStack) && processOp(opStack, exit_code);
-        eprintf("Unexpected operation: %c\n", op);
+            return processClosedBrace(opStack, pExitCode) && processOp(opStack, pExitCode);
+        eprintf(pExitCode, "Unexpected operation: %c\n", op);
         return false;
     }
 
@@ -120,15 +125,17 @@ bool processOp(Stack* opStack, int* exit_code)
 
 /*
  * Return false when either error encountered, EOF or '\n'
+ * *pExitCode must be initialized.
+ * *pExitCode = 1 on errors occured.
  */
-bool processPrimaryExpr(Stack* opStack, int* exit_code)
+bool processPrimaryExpr(Stack* opStack, int* pExitCode)
 {
     int ch = getInput();
     if (isdigit(ch)) {
         putOutput(ch);
         ch = getInput();
         if (ch == ')') {
-            if (!processClosedBrace(opStack))
+            if (!processClosedBrace(opStack, pExitCode))
                 return false;
         } else {
             putback(ch);
@@ -136,59 +143,66 @@ bool processPrimaryExpr(Stack* opStack, int* exit_code)
         return true;
     } else if (ch == '(') {
         stackPush(opStack, ch);
-        return processPrimaryExpr(opStack, exit_code);
+        return processPrimaryExpr(opStack, pExitCode);
     } else if (isEOF(ch)) {
-        eprintf("Expected primary expression\n");
+        eprintf(pExitCode, "Expected primary expression\n");
         return false;
     }
 
-    eprintf("Unexpected primary expression: %c\n", ch);
+    eprintf(pExitCode, "Unexpected primary expression: %c\n", ch);
     return false;
 }
 
 /*
  * Return false when either error encountered, EOF or '\n'
+ * If error encountered *pExitCode = 1.
+ * *pExitCode must be initialized.
  */
-bool processExpr(Stack* opStack, int* exit_code)
+bool processExpr(Stack* opStack, int* pExitCode)
 {
-    if (!processPrimaryExpr(opStack, exit_code))
+    if (!processPrimaryExpr(opStack, pExitCode))
         return false;
 
-    if (!processOp(opStack, exit_code))
+    if (!processOp(opStack, pExitCode))
         return false;
 
     return true;
 }
 
-int clearOpStack(Stack* opStack)
+/*
+ * Just pushes all the operations to the output.
+ * It must be called after all the operations.
+ * If error encountered *pExitCode = 1.
+ * *pExitCode must be initialized.
+ */
+void clearOpStack(Stack* opStack, int* pExitCode)
 {
     while (!stackEmpty(opStack)) {
         int ch = stackPop(opStack);
         if (ch == '(') {
-            eprintf("Missing ')'\n");
-            return 1;
+            eprintf(pExitCode, "Missing ')'\n");
+            break;
         }
 
         putOutput(ch);
     }
-    return 0;
 }
 
 int translateToPolishNotation()
 {
     Stack opStack;
     stackInit(&opStack);
-    int exit_code = 0;
-    while (processExpr(&opStack, &exit_code));
+    int exitCode = 0;
+    while (processExpr(&opStack, &exitCode));
 
-    if (exit_code == 0)
-        exit_code = clearOpStack(&opStack);
+    if (exitCode == 0)
+        clearOpStack(&opStack, &exitCode);
 
-    if (exit_code == 0)
+    if (exitCode == 0)
         printOutput();
 
     stackFree(&opStack);
-    return exit_code;
+    return exitCode;
 }
 
 int main(void)
