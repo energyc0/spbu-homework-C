@@ -2,43 +2,114 @@
 #include <stdio.h>
 #include <ctype.h>
 
-int getInput(FILE* fp)
+#define eprintf(...) fprintf(stderr, __VA_ARGS__)
+
+static int _putback = '\0';
+static char _outputBuf[BUFSIZ];
+static int _outputBufSize = 0;
+/*
+ * Skip white spaces and tabs and return character from the input.
+ */
+int getInput()
 {
     int ch;
-    for (ch = getc(fp); isblank(ch); ch = getc(fp));
+    if (_putback) {
+        ch = _putback;
+        _putback = '\0';
+        return ch;
+    }
+    for (ch = getchar(); isblank(ch); ch = getchar());
     return ch;
 }
 
-bool isBinOp(int ch) 
+bool putOutput(int ch)
 {
-    return ch == '+' || ch == '-' || ch == '/' || ch == '*';
+    if (_outputBufSize >= (int)(sizeof(_outputBuf) - 2))
+        return false;
+
+    _outputBuf[_outputBufSize++] = ch;
+    _outputBuf[_outputBufSize++] = ' ';
+
+    return true;
 }
 
-bool isToken(int ch)
+void printOutput()
 {
-    return isdigit(ch) || ch == '(' || ch == ')' || isBinOp(ch);
+    _outputBuf[_outputBufSize] = '\0';
+    printf("%s\n", _outputBuf);
 }
 
+/*
+ * Puts character back into the stream.
+ */
+void putback(int ch) 
+{
+    _putback = ch;
+}
+
+bool isEOF(int ch)
+{
+    return ch == EOF || ch == '\n';
+}
+
+/*
+ * Get operation precedence in expression.
+ * Return -1 if it is unknown operation.
+ */
 int getOpPrec(int op)
 {
-    if (op == '-' || op == '+')
-        return 1;
-    else if (op == '/' || op == '*')
-        return 2;
-    else 
-        return -1;
+    switch (op) {
+        case '-': case '+':
+            return 1;
+        case '/': case '*':
+            return 2;
+        default:
+            return -1;
+    }
 }
 
-bool processOp(Stack* opStack, int op)
+/*
+ * Pops all the operations from 'opStack' until '('.
+ * Return false and print error message if '(' is not found.
+ */
+bool processClosedBrace(Stack* opStack)
 {
-    int prec = getOpPrec(op);
-    if (prec == -1)
+    while (!stackEmpty(opStack) && stackPeek(opStack) != '(')
+        putOutput(stackPop(opStack));
+
+    if (stackEmpty(opStack)) {
+        eprintf ("Missing '('\n");
         return false;
+    }
+
+    stackPop(opStack);
+    return true;
+}
+
+/*
+ * Gets arithmetic operation.
+ * Return true if parsed successfully.
+ * Return false if either EOF, '\n' or error found.
+ * Prints error messages.
+ * Pops and prints all the operation with lower precedence.
+*/
+bool processOp(Stack* opStack, int* exit_code)
+{
+    int op = getInput();
+    int prec = getOpPrec(op);
+    if (prec == -1) {
+        if (isEOF(op))
+            return false;
+        if (op == ')')
+            return processClosedBrace(opStack) && processOp(opStack, exit_code);
+        eprintf("Unexpected operation: %c\n", op);
+        return false;
+    }
 
     while (!stackEmpty(opStack)) {
         int temp = stackPeek(opStack);
         if (getOpPrec(temp) >= prec)
-            printf("%c ", stackPop(opStack));
+            putOutput(stackPop(opStack));
         else
             break;
     }
@@ -47,63 +118,82 @@ bool processOp(Stack* opStack, int op)
     return true;
 }
 
-bool processClosedBrace(Stack* opStack)
+/*
+ * Return false when either error encountered, EOF or '\n'
+ */
+bool processPrimaryExpr(Stack* opStack, int* exit_code)
 {
-    while (!stackEmpty(opStack) && stackPeek(opStack) != '(')
-        printf("%c ", stackPop(opStack));
+    int ch = getInput();
+    if (isdigit(ch)) {
+        putOutput(ch);
+        ch = getInput();
+        if (ch == ')') {
+            if (!processClosedBrace(opStack))
+                return false;
+        } else {
+            putback(ch);
+        }
+        return true;
+    } else if (ch == '(') {
+        stackPush(opStack, ch);
+        return processPrimaryExpr(opStack, exit_code);
+    } else if (isEOF(ch)) {
+        eprintf("Expected primary expression\n");
+        return false;
+    }
 
-    if (stackEmpty(opStack))
+    eprintf("Unexpected primary expression: %c\n", ch);
+    return false;
+}
+
+/*
+ * Return false when either error encountered, EOF or '\n'
+ */
+bool processExpr(Stack* opStack, int* exit_code)
+{
+    if (!processPrimaryExpr(opStack, exit_code))
         return false;
 
-    stackPop(opStack);
+    if (!processOp(opStack, exit_code))
+        return false;
+
     return true;
 }
 
-int translateToPolishNotation(FILE* fp)
+int clearOpStack(Stack* opStack)
 {
-#define errorQuit(...) do { \
-    fprintf(stderr, __VA_ARGS__); \
-    return 1; \
-} while(0) 
+    while (!stackEmpty(opStack)) {
+        int ch = stackPop(opStack);
+        if (ch == '(') {
+            eprintf("Missing ')'\n");
+            return 1;
+        }
 
+        putOutput(ch);
+    }
+    return 0;
+}
+
+int translateToPolishNotation()
+{
     Stack opStack;
     stackInit(&opStack);
+    int exit_code = 0;
+    while (processExpr(&opStack, &exit_code));
 
-    int ch;
-    for (ch = getInput(fp); isToken(ch); ch = getInput(fp)) {
-        if (isdigit(ch)) {
-            printf("%c ", ch);
-        } else if (ch == '(') {
-            stackPush(&opStack, ch);
-        } else if (ch == ')') {
-            if (!processClosedBrace(&opStack))
-                errorQuit("Missing '('\n");
-        } else if (isBinOp(ch)) {
-            processOp(&opStack, ch);
-        } else {
-            break;
-        }
-    }
+    if (exit_code == 0)
+        exit_code = clearOpStack(&opStack);
 
-    if (ch != EOF && ch != '\n')
-        errorQuit("Undefined character: '%c'\n", ch);
+    if (exit_code == 0)
+        printOutput();
 
-    while (!stackEmpty(&opStack)) {
-        ch = stackPop(&opStack);
-        if (ch == '(')
-            errorQuit("Missing ')'\n");
-
-        printf("%c ", ch);
-    }
-    putchar('\n');
-
-    return 0;
-
-    #undef errorQuit
+    stackFree(&opStack);
+    return exit_code;
 }
 
 int main(void)
 {
-    printf("Enter expression:\n");
-    return translateToPolishNotation(stdin);
+    printf("Enter expression\n"
+        "(single digits, '+', '-', '*', '/', '(', ')' are allowed):\n");
+    return translateToPolishNotation();
 }
