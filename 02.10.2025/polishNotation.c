@@ -1,15 +1,16 @@
-#include "stack.h"
 #include "polishNotationIO.h"
-#include <stdio.h>
+#include "stack.h"
 #include <ctype.h>
+#include <stdio.h>
 
 /*
  * Print error and assign *pExitCode = 1
  */
-#define eprintf(pExitCode, ...) do { \
-    fprintf(stderr, __VA_ARGS__); \
-    *pExitCode = 1; \
-} while(0)
+#define eprintf(pExitCode, ...)       \
+    do {                              \
+        fprintf(stderr, __VA_ARGS__); \
+        *pExitCode = 1;               \
+    } while (0)
 
 /*
  * Get operation precedence in expression.
@@ -18,12 +19,14 @@
 int getOpPrec(int op)
 {
     switch (op) {
-        case '-': case '+':
-            return 1;
-        case '/': case '*':
-            return 2;
-        default:
-            return -1;
+    case '-':
+    case '+':
+        return 1;
+    case '/':
+    case '*':
+        return 2;
+    default:
+        return -1;
     }
 }
 
@@ -39,7 +42,7 @@ bool processClosedBrace(Stack* opStack, int* pExitCode)
         putOutput(stackPop(opStack));
 
     if (stackEmpty(opStack)) {
-        eprintf (pExitCode, "Missing '('\n");
+        eprintf(pExitCode, "Missing '('\n");
         return false;
     }
 
@@ -53,7 +56,7 @@ bool processClosedBrace(Stack* opStack, int* pExitCode)
  * Return false if either EOF, '\n' or error found.
  * Prints error messages.
  * Pops and prints all the operation with lower precedence.
-*/
+ */
 bool processOp(Stack* opStack, int* pExitCode)
 {
     int op = getInput();
@@ -149,7 +152,8 @@ int translateToPolishNotation()
     Stack opStack;
     stackInit(&opStack);
     int exitCode = 0;
-    while (processExpr(&opStack, &exitCode));
+    while (processExpr(&opStack, &exitCode))
+        ;
 
     if (exitCode == 0)
         clearOpStack(&opStack, &exitCode);
@@ -164,6 +168,6 @@ int translateToPolishNotation()
 int main(void)
 {
     printf("Enter expression\n"
-        "(single digits, '+', '-', '*', '/', '(', ')' are allowed):\n");
+           "(single digits, '+', '-', '*', '/', '(', ')' are allowed):\n");
     return translateToPolishNotation();
 }

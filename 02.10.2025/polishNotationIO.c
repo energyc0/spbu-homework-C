@@ -1,6 +1,6 @@
 #include "polishNotationIO.h"
-#include <stdio.h>
 #include <ctype.h>
+#include <stdio.h>
 
 static int _putback = '\0';
 static char _outputBuf[BUFSIZ];
@@ -14,7 +14,8 @@ int getInput()
         _putback = '\0';
         return ch;
     }
-    for (ch = getchar(); isblank(ch); ch = getchar());
+    for (ch = getchar(); isblank(ch); ch = getchar())
+        ;
     return ch;
 }
 
@@ -32,7 +33,7 @@ void printOutput()
     printf("%s\n", _outputBuf);
 }
 
-void putback(int ch) 
+void putback(int ch)
 {
     _putback = ch;
 }
