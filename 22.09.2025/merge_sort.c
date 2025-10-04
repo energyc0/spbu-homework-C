@@ -11,17 +11,18 @@
  */
 int scanNumbers(int* arr, int capacity)
 {
-    char buf[BUFSIZ];
+    char buf[BUFSIZ] = {0};
     printf("Enter numbers:\n");
-    fgets(buf, sizeof(buf), stdin);
+    if (fgets(buf, sizeof(buf), stdin) == NULL)
+        return 0;
 
     int num = 0;
     int offset = 0;
-    int number_offset = 0;
+    int numberOffset = 0;
     int size = 0;
-    while (size < capacity && sscanf(buf + offset, "%d%n", &num, &number_offset) == 1) {
+    while (size < capacity && sscanf(buf + offset, "%d%n", &num, &numberOffset) == 1) {
         arr[size++] = num;
-        offset += number_offset;
+        offset += numberOffset;
     }
 
     return size;
@@ -33,24 +34,24 @@ int scanNumbers(int* arr, int capacity)
  */
 int printSortedArray(const int* arr, int size)
 {
-    int temp_buf[size];
-    memcpy(temp_buf, arr, size * sizeof(int));
-    mergeSort(temp_buf, size);
+    int tempBuf[size];
+    memcpy(tempBuf, arr, size * sizeof(int));
+    mergeSort(tempBuf, size);
 
-    int pos_changes = 0;
+    int posChanges = 0;
     for (int i = 0; i < size; i++) {
-        if (temp_buf[i] != arr[i])
-            pos_changes++;
-        printf("%d ", temp_buf[i]);
+        if (tempBuf[i] != arr[i])
+            posChanges++;
+        printf("%d ", tempBuf[i]);
     }
 
     putchar('\n');
-    return pos_changes;
+    return posChanges;
 }
 
 int main(void)
 {
-    int buf[BUFFER_CAPACITY];
+    int buf[BUFFER_CAPACITY] = {0};
     int size = scanNumbers(buf, BUFFER_CAPACITY);
 
     return printSortedArray(buf, size);
