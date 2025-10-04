@@ -11,7 +11,7 @@
  */
 int scanNumbers(int* arr, int capacity)
 {
-    char buf[BUFSIZ] = {0};
+    char buf[BUFSIZ] = { 0 };
     printf("Enter numbers:\n");
     if (fgets(buf, sizeof(buf), stdin) == NULL)
         return 0;
@@ -51,7 +51,7 @@ int printSortedArray(const int* arr, int size)
 
 int main(void)
 {
-    int buf[BUFFER_CAPACITY] = {0};
+    int buf[BUFFER_CAPACITY] = { 0 };
     int size = scanNumbers(buf, BUFFER_CAPACITY);
 
     return printSortedArray(buf, size);
