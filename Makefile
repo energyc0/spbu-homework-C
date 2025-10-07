@@ -1,15 +1,13 @@
-SRC=$(wildcard */*.c)
-OUT=$(patsubst %.c, %.out, $(SRC))
+HOMETASKS:=$(shell find -maxdepth 1 -type d ! -name .git ! -name .)
 
-CFLAGS=-Wall -pedantic -Wextra
-CC=gcc
-
-all: $(OUT)
-	echo $(OUT)
-%.out: %.c
-	$(CC) $(CFLAGS) -o $@ $^
+all:
+	for task in $(HOMETASKS); do \
+		make -C $$task ; \
+	done
 
 clean:
-	rm -rf */*.out
+		for task in $(HOMETASKS); do \
+		make -C $$task clean; \
+	done
 
-.PHONY: clean
+.PHONY: clean all
