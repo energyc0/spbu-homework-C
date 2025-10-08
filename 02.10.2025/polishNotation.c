@@ -38,10 +38,10 @@ int getOpPrec(int op)
  */
 bool processClosedBrace(Stack* opStack, int* pExitCode)
 {
-    while (!stackEmpty(opStack) && stackPeek(opStack) != '(')
+    while (!isStackEmpty(opStack) && stackPeek(opStack) != '(')
         putOutput(stackPop(opStack));
 
-    if (stackEmpty(opStack)) {
+    if (isStackEmpty(opStack)) {
         eprintf(pExitCode, "Missing '('\n");
         return false;
     }
@@ -57,20 +57,20 @@ bool processClosedBrace(Stack* opStack, int* pExitCode)
  * Prints error messages.
  * Pops and prints all the operation with lower precedence.
  */
-bool processOp(Stack* opStack, int* pExitCode)
+bool processOp(Stack* opStack, int* pExitCode, char* buf, int* idx)
 {
-    int op = getInput();
+    int op = getInput(buf, idx);
     int prec = getOpPrec(op);
     if (prec == -1) {
-        if (isEOF(op))
+        if (op == EOF)
             return false;
         if (op == ')')
-            return processClosedBrace(opStack, pExitCode) && processOp(opStack, pExitCode);
+            return processClosedBrace(opStack, pExitCode) && processOp(opStack, pExitCode, buf, idx);
         eprintf(pExitCode, "Unexpected operation: %c\n", op);
         return false;
     }
 
-    while (!stackEmpty(opStack)) {
+    while (!isStackEmpty(opStack)) {
         int temp = stackPeek(opStack);
         if (getOpPrec(temp) >= prec)
             putOutput(stackPop(opStack));
@@ -87,28 +87,30 @@ bool processOp(Stack* opStack, int* pExitCode)
  * *pExitCode must be initialized.
  * *pExitCode = 1 on errors occured.
  */
-bool processPrimaryExpr(Stack* opStack, int* pExitCode)
+bool processPrimaryExpr(Stack* opStack, int* pExitCode, char* buf, int* idx)
 {
-    int ch = getInput();
+    int ch = getInput(buf, idx);
     if (isdigit(ch)) {
         putOutput(ch);
-        ch = getInput();
+
+        ch = getInput(buf, idx);
         if (ch == ')') {
             if (!processClosedBrace(opStack, pExitCode))
                 return false;
-        } else {
-            putback(ch);
+        }else {
+            (*idx)--;
         }
         return true;
     } else if (ch == '(') {
         stackPush(opStack, ch);
-        return processPrimaryExpr(opStack, pExitCode);
-    } else if (isEOF(ch)) {
-        eprintf(pExitCode, "Expected primary expression\n");
-        return false;
+        return processPrimaryExpr(opStack, pExitCode, buf, idx);
     }
 
-    eprintf(pExitCode, "Unexpected primary expression: %c\n", ch);
+    if (ch == EOF)
+        eprintf(pExitCode, "Expected primary expression\n");
+    else
+        eprintf(pExitCode, "Unexpected primary expression: %c\n", ch);
+
     return false;
 }
 
@@ -119,11 +121,17 @@ bool processPrimaryExpr(Stack* opStack, int* pExitCode)
  */
 bool processExpr(Stack* opStack, int* pExitCode)
 {
-    if (!processPrimaryExpr(opStack, pExitCode))
-        return false;
+    char buf[BUFSIZ];
+    if (fgets(buf, sizeof(buf), stdin) == NULL)
+            return false;
 
-    if (!processOp(opStack, pExitCode))
-        return false;
+    for (int i = 0; buf[i];) {
+        if (!processPrimaryExpr(opStack, pExitCode, buf, &i))
+            return false;
+
+        if (!processOp(opStack, pExitCode, buf, &i))
+            return false;
+    }
 
     return true;
 }
@@ -136,7 +144,7 @@ bool processExpr(Stack* opStack, int* pExitCode)
  */
 void clearOpStack(Stack* opStack, int* pExitCode)
 {
-    while (!stackEmpty(opStack)) {
+    while (!isStackEmpty(opStack)) {
         int ch = stackPop(opStack);
         if (ch == '(') {
             eprintf(pExitCode, "Missing ')'\n");

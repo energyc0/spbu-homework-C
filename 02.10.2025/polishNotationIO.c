@@ -2,43 +2,62 @@
 #include <ctype.h>
 #include <stdio.h>
 
-static int _putback = '\0';
-static char _outputBuf[BUFSIZ];
-static int _outputBufSize = 0;
+#define ARRAY_CAPACITY (BUFSIZ)
 
-int getInput()
+typedef struct Array {
+    char buf[ARRAY_CAPACITY];
+    int idx;
+} Array;
+
+static Array input = {.buf = {0}, .idx = 0};
+static Array output = {.buf = {0}, .idx = 0};
+
+void skipSpaces(const char* buf, int* idx)
 {
-    int ch;
-    if (_putback) {
-        ch = _putback;
-        _putback = '\0';
-        return ch;
-    }
-    for (ch = getchar(); isblank(ch); ch = getchar())
+    for (; isspace(buf[*idx]); (*idx)++)
         ;
-    return ch;
+
+}
+
+int getInput(const char* buf, int* idx)
+{
+
+    for (; isspace(buf[*idx]); (*idx)++)
+        ;
+
+    return buf[*idx] == '\0' ? EOF : buf[(*idx)++];
+    /*
+    if (input.buf[input.idx] == '\0' && input.idx == 0)
+        if (fgets(input.buf, sizeof(input.buf), stdin) == NULL)
+            return EOF;
+
+
+    for (; isspace(input.buf[input.idx]); input.idx++)
+        ;
+
+    if (input.buf[input.idx] == '\0')
+        return EOF;
+
+    return input.buf[input.idx++];
+    */
 }
 
 void putOutput(int ch)
 {
-    if (_outputBufSize < (int)(sizeof(_outputBuf) - 2)) {
-        _outputBuf[_outputBufSize++] = ch;
-        _outputBuf[_outputBufSize++] = ' ';
+    if (output.idx < (int)(sizeof(output.buf) - 2)) {
+        output.buf[output.idx++] = ch;
+        output.buf[output.idx++] = ' ';
     }
 }
 
 void printOutput()
 {
-    _outputBuf[_outputBufSize] = '\0';
-    printf("%s\n", _outputBuf);
+    output.buf[output.idx] = '\0';
+    printf("%s\n", output.buf);
 }
 
-void putback(int ch)
+void putback()
 {
-    _putback = ch;
-}
-
-bool isEOF(int ch)
-{
-    return ch == EOF || ch == '\n';
+    if (input.idx > 0)
+        input.idx--;
 }

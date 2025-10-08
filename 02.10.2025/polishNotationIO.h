@@ -8,9 +8,11 @@
  */
 
 /*
- * Skip white spaces and tabs and return character from the input.
+ * Skip white spaces and tabs and return character from 'buf'.
+ * Automatically increments index.
+ * Return EOF, when '\0' occures.
  */
-int getInput();
+int getInput(const char* buf, int* idx);
 
 /*
  * Puts character to the buffered output.
@@ -24,11 +26,5 @@ void printOutput();
 
 /*
  * Puts one character back into the stream.
- * You can put ONLY ONE character back.
  */
-void putback(int ch);
-
-/*
- * is char == EOF or '\n'
- */
-bool isEOF(int ch);
+void putback();
