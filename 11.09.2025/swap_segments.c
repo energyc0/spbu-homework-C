@@ -48,10 +48,10 @@ void pushUserNumbers(struct Vector* v)
 
     int num = 0;
     int offset = 0;
-    int number_offset = 0;
-    while (sscanf(buf + offset, "%d%n", &num, &number_offset) == 1) {
+    int numberOffset = 0;
+    while (sscanf(buf + offset, "%d%n", &num, &numberOffset) == 1) {
         vectorPushBack(v, num);
-        offset += number_offset;
+        offset += numberOffset;
     }
     if (v->size == 0)
         errQuit("Expected at least one number");

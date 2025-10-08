@@ -7,23 +7,34 @@ typedef struct Stack {
     struct StackNode* _data;
 } Stack;
 
-// Allocate new stack on the heap and initialize it
-Stack* stackAlloc();
-
-// Free stack internals, do not free Stack* pointer
+/*
+ * Free stack internals, do not free Stack* pointer.
+ */
 void stackFree(Stack* st);
 
-// Initialize stack structure
+/*
+ * Initialize stack structure.
+ */
 void stackInit(Stack* st);
 
-// Push value on the stack
+/*
+ * Push value on the stack.
+ */
 bool stackPush(Stack* st, int val);
 
-// Return top value from the stack
+/*
+ * Return top value from the stack.
+ * User must check if stack is empty to prevent undefined behavior.
+ */
 int stackPeek(const Stack* st);
 
-// Pop value from the stack and return it
+/*
+ * Pop value from the stack and return it.
+ * User must check if stack is empty to prevent undefined behavior.
+ */
 int stackPop(Stack* st);
 
-// Return true if stack is empty
-bool stackEmpty(const Stack* st);
+/*
+ * Return true if stack is empty.
+ */
+bool isStackEmpty(const Stack* st);
