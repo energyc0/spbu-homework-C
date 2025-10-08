@@ -4,10 +4,10 @@
 #include <string.h>
 
 /*
- * 0    - braces are not balanced.
- * 1    - braces are balanced.
+ * false    - braces are not balanced.
+ * true     - braces are balanced.
  */
-int checkBraceBalance(const char* str)
+bool checkBraceBalance(const char* str)
 {
     Stack st;
     stackInit(&st);
@@ -22,25 +22,25 @@ int checkBraceBalance(const char* str)
         case ')':
             if (isStackEmpty(&st) || stackPop(&st) != '(') {
                 stackFree(&st);
-                return 0;
+                return false;
             }
             break;
         case ']':
             if (isStackEmpty(&st) || stackPop(&st) != '[') {
                 stackFree(&st);
-                return 0;
+                return false;
             }
             break;
         case '}':
             if (isStackEmpty(&st) || stackPop(&st) != '{') {
                 stackFree(&st);
-                return 0;
+                return false;
             }
             break;
         }
     }
 
-    int res = isStackEmpty(&st);
+    bool res = isStackEmpty(&st);
     stackFree(&st);
     return res;
 }
@@ -54,6 +54,6 @@ int main(void)
 
     int res = checkBraceBalance(buf);
     printf("String is %s\n", res ? "balanced" : "not balanced");
-    
+
     return res;
 }
