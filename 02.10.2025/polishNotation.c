@@ -97,7 +97,7 @@ bool processPrimaryExpr(Stack* opStack, int* pExitCode, char* buf, int* idx)
         if (ch == ')') {
             if (!processClosedBrace(opStack, pExitCode))
                 return false;
-        }else {
+        } else {
             (*idx)--;
         }
         return true;
@@ -123,7 +123,7 @@ bool processExpr(Stack* opStack, int* pExitCode)
 {
     char buf[BUFSIZ];
     if (fgets(buf, sizeof(buf), stdin) == NULL)
-            return false;
+        return false;
 
     for (int i = 0; buf[i];) {
         if (!processPrimaryExpr(opStack, pExitCode, buf, &i))
