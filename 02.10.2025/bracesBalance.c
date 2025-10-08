@@ -4,7 +4,6 @@
 #include <string.h>
 
 /*
- * -1   - error occured.
  * 0    - braces are not balanced.
  * 1    - braces are balanced.
  */
@@ -21,31 +20,27 @@ int checkBraceBalance(const char* str)
             stackPush(&st, *ptr);
             break;
         case ')':
-            if (stackEmpty(&st) || stackPop(&st) != '(') {
+            if (isStackEmpty(&st) || stackPop(&st) != '(') {
                 stackFree(&st);
                 return 0;
             }
             break;
         case ']':
-            if (stackEmpty(&st) || stackPop(&st) != '[') {
+            if (isStackEmpty(&st) || stackPop(&st) != '[') {
                 stackFree(&st);
                 return 0;
             }
             break;
         case '}':
-            if (stackEmpty(&st) || stackPop(&st) != '{') {
+            if (isStackEmpty(&st) || stackPop(&st) != '{') {
                 stackFree(&st);
                 return 0;
             }
             break;
-        default:
-            fprintf(stderr, "Undefined character.\n");
-            stackFree(&st);
-            return -1;
         }
     }
 
-    int res = stackEmpty(&st);
+    int res = isStackEmpty(&st);
     stackFree(&st);
     return res;
 }
@@ -57,11 +52,8 @@ int main(void)
     if (fgets(buf, sizeof(buf), stdin) == NULL)
         return 0;
 
-    buf[strcspn(buf, "\n")] = '\0';
     int res = checkBraceBalance(buf);
-    if (res == -1)
-        return 1;
-    else
-        printf("String is %s\n", res ? "balanced" : "not balanced");
-    return 0;
+    printf("String is %s\n", res ? "balanced" : "not balanced");
+    
+    return res;
 }
