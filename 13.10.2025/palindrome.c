@@ -9,6 +9,10 @@
 #define TEST4 "abc"
 #define TEST5 "abc aba"
 
+/*
+ * Return true if the given string is palindrome.
+ * Skips spaces.
+ */
 bool isPalindrome(const char* s)
 {
     const char* start = s;
@@ -27,6 +31,9 @@ bool isPalindrome(const char* s)
     return true;
 }
 
+/*
+ * Pretty output of checking whether the string is palindrome.
+ */
 void printIsPalindrome(const char* s)
 {
     printf("'%s' is %s\n", s, isPalindrome(s) ? "palindrome" : "not palindrome");

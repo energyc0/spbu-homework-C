@@ -2,7 +2,9 @@
 
 #define LIMIT_FIB 1000000
 
-// Counts the sum of the even fibonacci numbers <= limit.
+/*
+ * Counts the sum of the even fibonacci numbers <= limit.
+ */
 long long unsigned evenFibNumbersCount(const long long unsigned limit)
 {
     long long unsigned result = 0;
@@ -10,10 +12,8 @@ long long unsigned evenFibNumbersCount(const long long unsigned limit)
     long long unsigned cur = 1;
 
     for (int idx = 1; cur <= limit; idx++) {
-        if (idx % 2 == 0) {
+        if (idx % 2 == 0)
             result += cur;
-            //printf("+%d\n", cur);
-        }
 
         long long unsigned temp = cur + prev;
         prev = cur;
