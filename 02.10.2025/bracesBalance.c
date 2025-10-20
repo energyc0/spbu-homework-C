@@ -9,30 +9,29 @@
  */
 bool checkBraceBalance(const char* str)
 {
-    Stack st;
-    stackInit(&st);
+    Stack* st = stackAlloc();
 
     for (const char* ptr = str; *ptr != '\0'; ptr++) {
         switch (*ptr) {
         case '(':
         case '{':
         case '[':
-            stackPush(&st, *ptr);
+            stackPush(st, *ptr);
             break;
         case ')':
-            if (isStackEmpty(&st) || stackPop(&st) != '(') {
+            if (isStackEmpty(st) || stackPop(st) != '(') {
                 stackFree(&st);
                 return false;
             }
             break;
         case ']':
-            if (isStackEmpty(&st) || stackPop(&st) != '[') {
+            if (isStackEmpty(st) || stackPop(st) != '[') {
                 stackFree(&st);
                 return false;
             }
             break;
         case '}':
-            if (isStackEmpty(&st) || stackPop(&st) != '{') {
+            if (isStackEmpty(st) || stackPop(st) != '{') {
                 stackFree(&st);
                 return false;
             }
@@ -40,7 +39,7 @@ bool checkBraceBalance(const char* str)
         }
     }
 
-    bool res = isStackEmpty(&st);
+    bool res = isStackEmpty(st);
     stackFree(&st);
     return res;
 }
