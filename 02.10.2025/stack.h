@@ -3,19 +3,18 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-typedef struct Stack {
-    struct StackNode* _data;
-} Stack;
+typedef struct Stack Stack;
 
 /*
- * Free stack internals, do not free Stack* pointer.
+ * Free stack internals and pointer.
+ * Pointer = NULL after call.
  */
-void stackFree(Stack* st);
+void stackFree(Stack** st);
 
 /*
- * Initialize stack structure.
+ * Allocate stack structure.
  */
-void stackInit(Stack* st);
+Stack* stackAlloc();
 
 /*
  * Push value on the stack.

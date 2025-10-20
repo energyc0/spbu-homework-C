@@ -6,9 +6,13 @@ typedef struct StackNode {
     struct StackNode* prev;
 } StackNode;
 
+typedef struct Stack {
+    struct StackNode* data;
+} Stack;
+
 static StackNode* stackNodeAlloc(int val)
 {
-    StackNode* ptr = (StackNode*)malloc(sizeof(struct StackNode));
+    StackNode* ptr = (StackNode*)malloc(sizeof(*ptr));
     if (ptr == NULL)
         return ptr;
 
@@ -17,24 +21,31 @@ static StackNode* stackNodeAlloc(int val)
     return ptr;
 }
 
-void stackFree(Stack* st)
+void stackFree(Stack** st)
 {
-    StackNode* ptr = st->_data;
+    StackNode* ptr = (*st)->data;
     while (ptr != NULL) {
         StackNode* temp = ptr->prev;
         free(ptr);
         ptr = temp;
     }
+
+    free(*st);
+    *st = NULL;
 }
 
-void stackInit(Stack* st)
+Stack* stackAlloc()
 {
-    st->_data = NULL;
+    Stack* ptr = malloc(sizeof(*ptr));
+    if (ptr == NULL)
+        return ptr;
+    ptr->data = NULL;
+    return ptr;
 }
 
 int stackPeek(const Stack* st)
 {
-    return st->_data->val;
+    return st->data->val;
 }
 
 bool stackPush(Stack* st, int val)
@@ -43,17 +54,17 @@ bool stackPush(Stack* st, int val)
     if (ptr == NULL)
         return false;
 
-    ptr->prev = st->_data;
-    st->_data = ptr;
+    ptr->prev = st->data;
+    st->data = ptr;
 
     return true;
 }
 
 int stackPop(Stack* st)
 {
-    int data = st->_data->val;
-    StackNode* ptr = st->_data;
-    st->_data = st->_data->prev;
+    int data = st->data->val;
+    StackNode* ptr = st->data;
+    st->data = st->data->prev;
     free(ptr);
 
     return data;
@@ -61,5 +72,5 @@ int stackPop(Stack* st)
 
 bool isStackEmpty(const Stack* st)
 {
-    return st->_data == NULL;
+    return st->data == NULL;
 }
