@@ -47,7 +47,6 @@ static int countingGame(int n, int m)
 
 int main(void)
 {
-    printf("%d\n", -1 % 10);
     int n;
     if (!getNum("Enter n:", &n))
         return 1;
