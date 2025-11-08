@@ -1,0 +1,8 @@
+add_library(sortedList sortedList.c)
+add_library(recursiveList recursiveList.c)
+
+add_executable(recursiveList_exercise recursiveList_exercise.c)
+add_executable(sortedList_exercise sortedList_exercise.c)
+
+target_link_libraries(recursiveList_exercise PRIVATE recursiveList)
+target_link_libraries(sortedList_exercise PRIVATE sortedList)
