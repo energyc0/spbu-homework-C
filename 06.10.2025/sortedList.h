@@ -52,6 +52,9 @@ bool isSortedListEmpty(const SortedList* pList);
 
 #ifdef DEBUG
 
+/*
+ * Start testing of sorted list. Returns 0 on success, 1 on fail.
+ */
 int launchSortedListTesting();
 
 #endif
