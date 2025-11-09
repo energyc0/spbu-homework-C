@@ -49,3 +49,9 @@ bool sortedListGet(const SortedList* pList, int index, int* value);
  * Check whether the SortedList is empty.
  */
 bool isSortedListEmpty(const SortedList* pList);
+
+#ifdef DEBUG
+
+int launchSortedListTesting();
+
+#endif
