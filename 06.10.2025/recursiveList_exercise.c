@@ -13,12 +13,13 @@ static bool getNum(const char* prompt, int* num)
     puts(prompt);
     int res = 0;
 
-    char buf[BUFSIZ];
-    while (fgets(buf, sizeof(buf) - 1, stdin) != NULL
-        && (res = sscanf(buf, "%d", num)) < 1) {
+    while ((res = scanf("%d", num)) < 1) {
         if (res == -1)
             break;
         printf("Invalid number, try again:\n");
+        // Skip to the next line.
+        while (getchar() != '\n')
+            ;
     }
 
     return res == 1;
@@ -34,24 +35,24 @@ static int countingGame(int n, int m)
     int values[n];
     for (int i = 0; i < n; i++)
         values[i] = i + 1;
-    RecursiveList list = makeRecursiveList(values, n);
-    removeSequenceRecursiveList(&list, m, true);
+    RecursiveList* pList = allocRecursiveList(values, n);
+    removeSequenceRecursiveList(pList, m, true);
 
     int result = -1;
-    if (!getRecursiveList(&list, 0, &result)) {
+    if (!getRecursiveList(pList, 0, &result)) {
         fprintf(stderr, "Something wrong occured to get element :(\n");
     }
-    freeRecursiveList(&list);
+    freeRecursiveList(&pList);
     return result;
 }
 
 int main(void)
 {
-    int n;
+    int n = 0;
     if (!getNum("Enter n:", &n))
         return 1;
 
-    int m;
+    int m = 0;
     if (!getNum("Enter m:", &m))
         return 1;
 

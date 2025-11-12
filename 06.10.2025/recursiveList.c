@@ -8,6 +8,11 @@ typedef struct ListNode {
     struct ListNode* prev;
 } ListNode;
 
+typedef struct RecursiveList {
+    struct ListNode* head;
+    int size;
+} RecursiveList;
+
 /*
  * Get the actual index of element.
  */
@@ -37,13 +42,13 @@ static ListNode* allocListNode(int data, ListNode* next, ListNode* prev)
  */
 static ListNode* deleteNodeRecursiveList(RecursiveList* pList, ListNode* node)
 {
-    if (pList->_head == NULL)
+    if (pList->head == NULL)
         return NULL;
-    if (node == pList->_head) {
+    if (node == pList->head) {
         if (node->next == node)
-            pList->_head = NULL;
+            pList->head = NULL;
         else
-            pList->_head = pList->_head->next;
+            pList->head = pList->head->next;
     }
 
     ListNode* prev = node->prev;
@@ -51,9 +56,9 @@ static ListNode* deleteNodeRecursiveList(RecursiveList* pList, ListNode* node)
     prev->next = next;
     next->prev = prev;
 
-    pList->_size--;
+    pList->size--;
     free(node);
-    return pList->_head == NULL ? NULL : next;
+    return pList->head == NULL ? NULL : next;
 }
 
 /*
@@ -61,60 +66,74 @@ static ListNode* deleteNodeRecursiveList(RecursiveList* pList, ListNode* node)
  */
 static ListNode* getNodeRecursiveList(const RecursiveList* pList, int idx)
 {
-    if (pList->_head == NULL)
+    if (pList->head == NULL)
         return NULL;
 
-    ListNode* node = pList->_head;
-    for (int i = 0; i < idx; i++, node = node->next)
-        ;
+    ListNode* node = pList->head;
+    for (int i = 0; i < idx; i++)
+        node = node->next;
 
     return node;
 }
 
-RecursiveList makeRecursiveList(const int* values, int size)
+RecursiveList* allocRecursiveList(const int* values, int size)
 {
-    RecursiveList list = { ._head = NULL, ._size = 0 };
+    RecursiveList* pList = calloc(1, sizeof(*pList));
+    if (pList == NULL)
+        return NULL;
+
     ListNode* tail = NULL;
 
     if (size > 0) {
-        list._head = allocListNode(values[0], NULL, NULL);
-        if (list._head == NULL)
-            return list;
-        list._head->prev = list._head->next = tail = list._head;
-        list._size = size;
+        pList->head = allocListNode(values[0], NULL, NULL);
+        if (pList->head == NULL) {
+            freeRecursiveList(&pList);
+            return NULL;
+        }
+        pList->head->prev = pList->head;
+        pList->head->next = tail = pList->head;
+        pList->size = size;
     }
 
     for (int i = 1; i < size; i++) {
-        tail->next = allocListNode(values[i], list._head, tail);
-        list._head->prev = tail->next;
+        tail->next = allocListNode(values[i], pList->head, tail);
+        if (tail->next == NULL) {
+            freeRecursiveList(&pList);
+            return NULL;
+        }
+        pList->head->prev = tail->next;
         tail = tail->next;
     }
 
-    return list;
+    return pList;
 }
 
-void freeRecursiveList(RecursiveList* pList)
+void freeRecursiveList(RecursiveList** pList)
 {
-    if (pList->_head == NULL)
+    if (pList == NULL || *pList == NULL)
         return;
 
-    for (ListNode* p = pList->_head;;) {
+    ListNode* head = (*pList)->head;
+    free(*pList);
+    *pList = NULL;
+    if (head == NULL)
+        return;
+
+    for (ListNode* p = head;;) {
         ListNode* temp = p->next;
         free(p);
-        if (temp == pList->_head)
+        if (temp == head)
             break;
         p = temp;
     }
-    pList->_head = NULL;
-    pList->_size = 0;
 }
 
 bool eraseRecursiveList(RecursiveList* pList, int idx)
 {
-    if (pList->_head == NULL)
+    if (pList->head == NULL)
         return false;
 
-    idx = roundIndex(idx, pList->_size);
+    idx = roundIndex(idx, pList->size);
     ListNode* node = getNodeRecursiveList(pList, idx);
     deleteNodeRecursiveList(pList, node);
 
@@ -124,10 +143,10 @@ bool eraseRecursiveList(RecursiveList* pList, int idx)
 void printRecursiveList(const RecursiveList* pList)
 {
     putchar('[');
-    if (pList->_head != NULL) {
-        for (ListNode* p = pList->_head;; p = p->next) {
+    if (pList->head != NULL) {
+        for (ListNode* p = pList->head;; p = p->next) {
             printf("%d", p->data);
-            if (p->next != pList->_head)
+            if (p->next != pList->head)
                 printf(", ");
             else
                 break;
@@ -139,10 +158,10 @@ void printRecursiveList(const RecursiveList* pList)
 void printRecursiveListReverse(const RecursiveList* pList)
 {
     putchar('[');
-    if (pList->_head != NULL) {
-        for (ListNode* p = pList->_head->prev;; p = p->prev) {
+    if (pList->head != NULL) {
+        for (ListNode* p = pList->head->prev;; p = p->prev) {
             printf("%d", p->data);
-            if (p->prev != pList->_head)
+            if (p->prev != pList->head)
                 printf(", ");
             else
                 break;
@@ -163,14 +182,14 @@ bool getRecursiveList(const RecursiveList* pList, int idx, int* val)
 
 void removeSequenceRecursiveList(RecursiveList* pList, int m, bool isVerbose)
 {
-    if (pList->_head == NULL)
+    if (pList->head == NULL)
         return;
 
-    m = roundIndex(m, pList->_size);
+    m = roundIndex(m, pList->size);
     printRecursiveList(pList);
 
-    ListNode* p = pList->_head;
-    while (pList->_head->next != pList->_head) {
+    ListNode* p = pList->head;
+    while (pList->head->next != pList->head) {
         for (int i = 1; i < m; i++, p = p->next)
             ;
         p = deleteNodeRecursiveList(pList, p);
@@ -181,5 +200,5 @@ void removeSequenceRecursiveList(RecursiveList* pList, int m, bool isVerbose)
 
 int getSizeRecursiveList(const RecursiveList* pList)
 {
-    return pList->_size;
+    return pList->size;
 }

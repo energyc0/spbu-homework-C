@@ -6,20 +6,17 @@
  * Function wrapper for convenient recursive list.
  */
 
-typedef struct RecursiveList {
-    struct ListNode* _head;
-    int _size;
-} RecursiveList;
+typedef struct RecursiveList RecursiveList;
 
 /*
  * Construct recursive list of length 'size' containing values from 'values'.
  */
-RecursiveList makeRecursiveList(const int* values, int size);
+RecursiveList* allocRecursiveList(const int* values, int size);
 
 /*
- * Frees the content of the list, do not free pList pointer.
+ * Frees the content of the list, sets pointer to NULL.
  */
-void freeRecursiveList(RecursiveList* pList);
+void freeRecursiveList(RecursiveList** pList);
 
 /*
  * Erase element from the recursive list.
