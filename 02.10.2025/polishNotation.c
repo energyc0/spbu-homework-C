@@ -157,8 +157,7 @@ void clearOpStack(Stack* opStack, int* pExitCode)
 
 int translateToPolishNotation()
 {
-    Stack* pOpStack;
-    pOpStack = stackAlloc();
+    Stack* pOpStack = stackAlloc();
     int exitCode = 0;
     while (processExpr(pOpStack, &exitCode))
         ;
