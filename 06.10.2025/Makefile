@@ -1,0 +1,20 @@
+BUILDDIR=build
+
+CFLAGS=-Wall -pedantic -Wextra
+CC=gcc
+
+all: $(BUILDDIR) $(BUILDDIR)/recursiveList_exercise.out
+
+$(BUILDDIR):
+	mkdir -p $(BUILDDIR)
+
+$(BUILDDIR)/recursiveList.o: recursiveList.c recursiveList.h
+	$(CC) $(CFLAGS) -c recursiveList.c -o $@
+
+$(BUILDDIR)/recursiveList_exercise.out: recursiveList_exercise.c $(BUILDDIR)/recursiveList.o
+	$(CC) $(CFLAGS) -o $@ $^
+
+clean:
+	rm -rf $(BUILDDIR)
+
+.PHONY: clean all
