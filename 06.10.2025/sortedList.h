@@ -2,20 +2,18 @@
 
 #include <stdbool.h>
 
-typedef struct SortedList {
-    struct ListNode* _head;
-} SortedList;
+typedef struct SortedList SortedList;
 
 /*
- * Initialize SortedList structure.
+ * Allocate and initialize SortedList structure.
  */
-void sortedListInit(SortedList* pList);
+SortedList* sortedListAlloc();
 
 /*
  * Free SortedList internals.
- * Do not frees SortedList pointer.
+ * Sets pList pointer to NULL.
  */
-void sortedListFree(SortedList* pList);
+void sortedListFree(SortedList** pList);
 
 /*
  * Insert value to the sortedList in sorted order.

@@ -7,9 +7,11 @@ typedef struct ListNode {
     struct ListNode* next;
 } ListNode;
 
-static ListNode* allocListNode(int value);
+struct SortedList {
+    struct ListNode* _head;
+};
 
-ListNode* allocListNode(int value)
+static ListNode* allocListNode(int value)
 {
     ListNode* ptr = malloc(sizeof(struct ListNode));
     if (ptr == NULL)
@@ -20,19 +22,27 @@ ListNode* allocListNode(int value)
     return ptr;
 }
 
-void sortedListInit(SortedList* pList)
+SortedList* sortedListAlloc()
 {
+    SortedList* pList = malloc(sizeof(*pList));
+    if (pList == NULL)
+        return NULL;
+
     pList->_head = NULL;
+    return pList;
 }
 
-void sortedListFree(SortedList* pList)
+void sortedListFree(SortedList** pList)
 {
-    ListNode* ptr = pList->_head;
+    ListNode* ptr = (*pList)->_head;
     while (ptr != NULL) {
         ListNode* temp = ptr->next;
         free(ptr);
         ptr = temp;
     }
+
+    free(*pList);
+    *pList = NULL;
 }
 
 bool sortedListInsert(SortedList* pList, int value)
@@ -44,15 +54,17 @@ bool sortedListInsert(SortedList* pList, int value)
     if (pList->_head == NULL) {
         pList->_head = newNode;
         return true;
-    } else if (pList->_head->value >= value) {
+    }
+
+    if (pList->_head->value >= value) {
         newNode->next = pList->_head;
         pList->_head = newNode;
         return true;
     }
 
     ListNode* ptr = pList->_head;
-    for (; ptr->next && ptr->next->value < value; ptr = ptr->next)
-        ;
+    while (ptr->next != NULL && ptr->next->value < value)
+        ptr = ptr->next;
 
     newNode->next = ptr->next;
     ptr->next = newNode;

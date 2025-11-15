@@ -19,8 +19,9 @@ static void printHelpInfo(void)
  */
 static char skipSpaces(char* buf)
 {
-    for (; isspace(*buf); buf++)
-        ;
+    while (isspace(*buf))
+        buf++;
+
     return *buf;
 }
 
@@ -42,7 +43,7 @@ static char* getInput(void)
 static bool getNum(int* num)
 {
     printf("Enter a number or 'q' to quit:\n");
-    char* data;
+    char* data = NULL;
     while ((data = getInput()) != NULL) {
         if (skipSpaces(data) == 'q')
             return false;
@@ -61,7 +62,7 @@ static bool getNum(int* num)
  */
 static void addValue(SortedList* list)
 {
-    int num;
+    int num = 0;
     if (getNum(&num))
         if (sortedListInsert(list, num))
             printf("Added the value successfully.\n");
@@ -78,7 +79,7 @@ static void removeValue(SortedList* list)
     }
     printf("Indexes start from 0.\n");
 
-    int idx;
+    int idx = 0;
     while (getNum(&idx)) {
         if (sortedListRemoveIndex(list, idx)) {
             printf("Removed successfully.\n");
@@ -119,17 +120,20 @@ static bool interactiveSortedList(SortedList* list, char command)
 
 int main(void)
 {
-    SortedList list;
-    sortedListInit(&list);
+    SortedList* pList = sortedListAlloc();
 
     printHelpInfo();
     while (1) {
         // If user sent EOF or decided to quit - break.
-        char* data;
         printf("Enter a command.\n");
-        if ((data = getInput()) == NULL
-            || !interactiveSortedList(&list, skipSpaces(data)))
+        char* data = getInput();
+        if (data == NULL)
+            break;
+        // Returns false, when user wants to quit.
+        if (!interactiveSortedList(pList, skipSpaces(data)))
             break;
     }
+
+    sortedListFree(&pList);
     return 0;
 }
