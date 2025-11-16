@@ -1,0 +1,4 @@
+add_executable(calculateDivision calc_div.c)
+add_executable(calculationBinom calculation_binom.c)
+add_executable(swapSegments swap_segments.c)
+add_executable(ticketCombinations ticket_comb.c)

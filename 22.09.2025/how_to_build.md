@@ -1,8 +1,9 @@
 ### How to build
 
-Everything is written in Makefile, just run
+Everything is written in CMakeLists.txt. You must be in the project root directory:
 ```bash
-make
+cmake -B build
+cmake --build build
 ```
 
-it will generate optimised assembly code in build directory, two object files and an executable.
+it will generate optimised assembly code in build directory, two object files and an executable (and other homeworks :) ).
