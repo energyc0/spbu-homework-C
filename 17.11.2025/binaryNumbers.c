@@ -1,20 +1,30 @@
 #include "binaryNumbers.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define BINARY_NUMBER_SIZE 32
+/*
+ * Binary numbers library, implemented for 'int' type.
+ */
+
+#define BINARY_NUMBER_SIZE (sizeof(int) * 8)
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
 
 typedef struct BinaryNumber {
     char data[BINARY_NUMBER_SIZE];
 } BinaryNumber;
 
-BinaryNumber* binaryNumberAlloc()
+/*
+ * Allocate new binary number and initialize it with zero.
+ */
+static BinaryNumber* binaryNumberAlloc()
 {
     BinaryNumber* ptr = malloc(sizeof(*ptr));
-    if (ptr == NULL)
+    if (ptr == NULL) {
+        fprintf(stderr, "Failed to allocate BinaryNumber!\n");
         return NULL;
-    memset(ptr->data, '0', sizeof(ptr->data));
+    }
+    memset(ptr->data, 0, sizeof(ptr->data));
     return ptr;
 }
 
@@ -23,9 +33,12 @@ BinaryNumber* binaryNumberAssign(BinaryNumber* binNum, int decNum)
     if (binNum == NULL)
         return NULL;
 
-    const int decSize = sizeof(decNum) * 8;
-    for (int bit = decSize-1; bit >= 0; bit--) {
-        binNum->data[bit] = ((decNum & (1 << (decSize - bit-1))) ? '1' : '0');
+    if (decNum == 0) {
+        memset(binNum->data, 0, sizeof(binNum->data));
+        return binNum;
+    }
+    for (int bit = BINARY_NUMBER_SIZE - 1; bit >= 0; bit--) {
+        binNum->data[bit] = ((decNum & (1 << (BINARY_NUMBER_SIZE - bit - 1))) ? 1 : 0);
     }
 
     return binNum;
@@ -39,19 +52,48 @@ BinaryNumber* binaryNumberCreate(int decNum)
 
 BinaryNumber* binaryNumberAdd(const BinaryNumber* a, const BinaryNumber* b, BinaryNumber* result)
 {
+    if (a == NULL || b == NULL)
+        return NULL;
 
+    if (result == NULL) {
+        result = binaryNumberAlloc();
+        if (result == NULL)
+            return NULL;
+    }
+
+    int carry = 0;
+    for (int bit = BINARY_NUMBER_SIZE - 1; bit >= 0; bit--) {
+        int res = a->data[bit] + b->data[bit] + carry;
+        result->data[bit] = res % 2;
+        carry = res / 2;
+    }
+    return result;
 }
 
-int binaryNumberToDecimal(const BinaryNumber* num);
+int binaryNumberToDecimal(const BinaryNumber* num)
+{
+    int result = 0;
+    for (int bit = BINARY_NUMBER_SIZE - 1; bit >= 0; bit--)
+        result += (num->data[bit] << (BINARY_NUMBER_SIZE - 1 - bit));
+    return result;
+}
 
 void binaryNumberPrint(FILE* stream, const BinaryNumber* num)
 {
-    for (int byte = 0; byte < BINARY_NUMBER_SIZE / 8; byte++)
-        fprintf(stream, "%.*s ", 8,  num->data + byte * 8);
+    if (num == NULL)
+        return;
+
+    for (int bit = 0; bit < (int)BINARY_NUMBER_SIZE; bit++) {
+        if (bit % 8 == 0 && bit > 0)
+            putc(' ', stream);
+        putc(num->data[bit] == 0 ? '0' : '1', stream);
+    }
 }
 
 void binaryNumberFree(BinaryNumber** binNum)
 {
-    free(*binNum);
-    *binNum = NULL;
+    if (binNum != NULL && *binNum != NULL) {
+        free(*binNum);
+        *binNum = NULL;
+    }
 }
