@@ -43,3 +43,11 @@ void binaryNumberPrint(FILE* stream, const BinaryNumber* binNum);
  * Frees memory for *binNum and set *binNum pointer to NULL
  */
 void binaryNumberFree(BinaryNumber** binNum);
+
+#ifdef DEBUG
+/*
+ * Run tests and return exit code.
+ * 0 - success, 1 - failed.
+ */
+int binaryNumberRunTests();
+#endif

@@ -97,3 +97,12 @@ void binaryNumberFree(BinaryNumber** binNum)
         *binNum = NULL;
     }
 }
+
+#ifdef DEBUG
+int binaryNumberRunTests()
+{
+    int returnCode = 0;
+    printf("Tests %s.\n", returnCode == 0 ? "succeded" : "failed");
+    return returnCode;
+}
+#endif
