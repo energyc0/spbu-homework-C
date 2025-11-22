@@ -98,10 +98,21 @@ void binaryNumberFree(BinaryNumber** binNum)
     }
 }
 
+int binaryNumberCompare(const BinaryNumber* a, const BinaryNumber* b)
+{
+    if (a == NULL || b == NULL)
+        return 0;
+    return strncmp(a->data, b->data, BINARY_NUMBER_SIZE);
+}
+
 #ifdef DEBUG
 int binaryNumberRunTests()
 {
     int returnCode = 0;
+
+    int a = 6;
+    int b = 17;
+
     printf("Tests %s.\n", returnCode == 0 ? "succeded" : "failed");
     return returnCode;
 }

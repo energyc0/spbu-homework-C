@@ -40,6 +40,13 @@ int binaryNumberToDecimal(const BinaryNumber* binNum);
 void binaryNumberPrint(FILE* stream, const BinaryNumber* binNum);
 
 /*
+ * Compare two binary numbers.
+ * Return 0 if they are equal or someone equals NULL.
+ * Return value > 0 if a > b, return value < 0 if a < b.
+ */
+int binaryNumberCompare(const BinaryNumber* a, const BinaryNumber* b);
+
+/*
  * Frees memory for *binNum and set *binNum pointer to NULL
  */
 void binaryNumberFree(BinaryNumber** binNum);
