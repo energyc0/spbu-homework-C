@@ -83,7 +83,7 @@ void binaryNumberPrint(FILE* stream, const BinaryNumber* num)
     if (num == NULL)
         return;
 
-    static char buf[BINARY_NUMBER_STR_SIZE] = {};
+    static char buf[BINARY_NUMBER_STR_SIZE] = { 0 };
     fprintf(stream, "%s", binaryNumberToStr(num, buf));
 }
 
@@ -133,8 +133,8 @@ void eprintDebug(int line, int* returnCode, const char* msg)
 
 void expectBinary(int line, int* returnCode, const BinaryNumber* binNum, const char* expectBin, int expectDec)
 {
-    static char binBuf[BINARY_NUMBER_STR_SIZE] = {};
-    char msgBuf[256] = {};
+    static char binBuf[BINARY_NUMBER_STR_SIZE] = { 0 };
+    char msgBuf[256] = { 0 };
     binaryNumberToStr(binNum, binBuf);
     if (memcmp(binBuf, expectBin, BINARY_NUMBER_STR_SIZE) != 0) {
         sprintf(msgBuf, "Unexpected binary number,\n"
@@ -191,6 +191,41 @@ int binaryNumberRunTests()
     };
     binaryCheckAddition(__LINE__, &args, &returnCode);
 
+    args.a = 255;
+    args.b = 1;
+    args.binStrA = "00000000 00000000 00000000 11111111";
+    args.binStrB = "00000000 00000000 00000000 00000001";
+    args.binStrRes = "00000000 00000000 00000001 00000000";
+    binaryCheckAddition(__LINE__, &args, &returnCode);
+
+    args.a = -1;
+    args.b = 1;
+    args.binStrA = "11111111 11111111 11111111 11111111";
+    args.binStrB = "00000000 00000000 00000000 00000001";
+    args.binStrRes = "00000000 00000000 00000000 00000000";
+    binaryCheckAddition(__LINE__, &args, &returnCode);
+
+    args.a = 2147483647;
+    args.b = 1;
+    args.binStrA = "01111111 11111111 11111111 11111111";
+    args.binStrB = "00000000 00000000 00000000 00000001";
+    args.binStrRes = "10000000 00000000 00000000 00000000";
+    binaryCheckAddition(__LINE__, &args, &returnCode);
+
+    args.a = -14;
+    args.b = 5;
+    args.binStrA = "11111111 11111111 11111111 11110010";
+    args.binStrB = "00000000 00000000 00000000 00000101";
+    args.binStrRes = "11111111 11111111 11111111 11110111";
+    binaryCheckAddition(__LINE__, &args, &returnCode);
+
+    args.a = -2147483648;
+    args.b = -1;
+    args.binStrA = "10000000 00000000 00000000 00000000";
+    args.binStrB = "11111111 11111111 11111111 11111111";
+    args.binStrRes = "01111111 11111111 11111111 11111111";
+    binaryCheckAddition(__LINE__, &args, &returnCode);
+
     if (returnCode == 0)
         printf("Passed tests.\n");
     else
@@ -198,4 +233,5 @@ int binaryNumberRunTests()
 
     return returnCode;
 }
+
 #endif
