@@ -83,7 +83,7 @@ void binaryNumberPrint(FILE* stream, const BinaryNumber* num)
     if (num == NULL)
         return;
 
-    static char buf[sizeof(int) * 9] = {};
+    static char buf[BINARY_NUMBER_STR_SIZE] = {};
     fprintf(stream, "%s", binaryNumberToStr(num, buf));
 }
 
@@ -120,37 +120,82 @@ char* binaryNumberToStr(const BinaryNumber* num, char* buf)
 
 #ifdef DEBUG
 
-#define STRINGINIZE(x) #x
-#define STRINGINIZE_DETAIL(x) STRINGINIZE(x)
-#define fprintfDebug(stream, ...) fprintf(stream, "[Line: " \
-    STRINGINIZE_DETAIL(__LINE__) "] " __VA_ARGS__)
+void fprintDebug(int line, FILE* stream, const char* msg)
+{
+    fprintf(stream, "[Line: %d] %s\n", line, msg);
+}
 
-#define eprintfDebug(returnCode, ...) do { \
-    returnCode = 1; \
-    fprintfDebug(stderr, __VA_ARGS__); \
-    } while(0)
+void eprintDebug(int line, int* returnCode, const char* msg)
+{
+    *returnCode = 1;
+    fprintDebug(line, stderr, msg);
+}
 
-#define expectBinary(returnCode, binNum, expectBin) do { \
-    if (memcmp(binNum->data, expectBin, BINARY_NUMBER_SIZE) != 0)\
-        eprintfDebug(returnCode, "Failed to convert to a binary number,\n"\
-        "\texpected: %.*s, found %.*s.\n", \
-        (int)BINARY_NUMBER_SIZE, expectBin, (int)BINARY_NUMBER_SIZE, binNum->data);\
-} while(0)
+void expectBinary(int line, int* returnCode, const BinaryNumber* binNum, const char* expectBin, int expectDec)
+{
+    static char binBuf[BINARY_NUMBER_STR_SIZE] = {};
+    char msgBuf[256] = {};
+    binaryNumberToStr(binNum, binBuf);
+    if (memcmp(binBuf, expectBin, BINARY_NUMBER_STR_SIZE) != 0) {
+        sprintf(msgBuf, "Unexpected binary number,\n"
+                        "\texpected: %.*s,\n\tfound %.*s.",
+            (int)BINARY_NUMBER_STR_SIZE, expectBin,
+            (int)BINARY_NUMBER_STR_SIZE, binBuf);
+        eprintDebug(line, returnCode, msgBuf);
+    }
+
+    int decimal = binaryNumberToDecimal(binNum);
+    if (decimal != expectDec) {
+        sprintf(msgBuf, "Unexpected binary to decimal conversion,\n"
+                        "\texpected: %d,\n\tfound: %d.",
+            expectDec, decimal);
+        eprintDebug(line, returnCode, msgBuf);
+    }
+}
+
+typedef struct {
+    int a;
+    int b;
+    const char* binStrA;
+    const char* binStrB;
+    const char* binStrRes;
+} BinaryCheckAdditionArgs;
+
+void binaryCheckAddition(int line, const BinaryCheckAdditionArgs* args, int* returnCode)
+{
+    BinaryNumber* binA = binaryNumberCreate(args->a);
+    BinaryNumber* binB = binaryNumberCreate(args->b);
+
+    expectBinary(line, returnCode, binA, args->binStrA, args->a);
+    expectBinary(line, returnCode, binB, args->binStrB, args->b);
+
+    BinaryNumber* result = NULL;
+    if ((result = binaryNumberAdd(binA, binB, result)) != NULL) {
+        expectBinary(line, returnCode, result,
+            args->binStrRes, args->a + args->b);
+    } else {
+        eprintDebug(line, returnCode, "Failed to perform addition!\n");
+    }
+}
 
 int binaryNumberRunTests()
 {
     int returnCode = 0;
 
-    int a = 6;
-    int b = 17;
-    BinaryNumber* binA = binaryNumberCreate(a);
-    BinaryNumber* binB = binaryNumberCreate(b);
+    BinaryCheckAdditionArgs args = {
+        .a = 6,
+        .b = 17,
+        .binStrA = "00000000 00000000 00000000 00000110",
+        .binStrB = "00000000 00000000 00000000 00010001",
+        .binStrRes = "00000000 00000000 00000000 00010111"
+    };
+    binaryCheckAddition(__LINE__, &args, &returnCode);
 
-    const int expectBinA[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1};
-    //expectBinary(returnCode, binA, expectBinA);
-    
+    if (returnCode == 0)
+        printf("Passed tests.\n");
+    else
+        fprintf(stderr, "Failed tests.\n");
 
-    fprintfDebug(stdout, "Tests %s.\n", returnCode == 0 ? "succeded" : "failed");
     return returnCode;
 }
 #endif

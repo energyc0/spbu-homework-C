@@ -8,6 +8,8 @@
 
 typedef struct BinaryNumber BinaryNumber;
 
+#define BINARY_NUMBER_STR_SIZE (sizeof(int) * 9)
+
 /*
  * Allocate newly created binary number initialized with decNum,
  * must call binaryNumberFree() to free memory.
@@ -53,7 +55,7 @@ void binaryNumberFree(BinaryNumber** binNum);
 
 /*
  * Convert binary number to string and store it in 'buf'.
- * 'buf' must be at least sizeof(int)*9 size.
+ * 'buf' must be at least BINARY_NUMBER_STR_SIZE size.
  * Returns NULL if 'buf' equals NULL.
  */
 char* binaryNumberToStr(const BinaryNumber* num, char* buf);
