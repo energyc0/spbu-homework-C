@@ -56,7 +56,7 @@ void binaryNumberFree(BinaryNumber** binNum);
  * 'buf' must be at least sizeof(int)*9 size.
  * Returns NULL if 'buf' equals NULL.
  */
-char* binaryNumberConvertToStr(const BinaryNumber* num, char* buf);
+char* binaryNumberToStr(const BinaryNumber* num, char* buf);
 
 #ifdef DEBUG
 /*
