@@ -2,10 +2,19 @@ cmake_minimum_required(VERSION 3.25)
 
 project(bracesBalance C)
 
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug)
+endif()
+
 file(GLOB DIRS LIST_DIRECTORIES true "./??.??.????")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pedantic -Wextra")
+if(CMAKE_BUILD_TYPE STREQUAL Debug)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -DDEBUG")
+endif()
+
 message(STATUS "Compiling with flags: ${CMAKE_C_FLAGS}")
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 foreach(DIR ${DIRS})
     if(EXISTS ${DIR}/CMakeLists.txt)
