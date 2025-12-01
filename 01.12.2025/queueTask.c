@@ -8,15 +8,15 @@
 int launchTests()
 {
     Queue* q = makeQueue();
-    int vals[] = {0,1,2,3,4,5,6,7,8,9,10};
-    
+    int vals[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
     for (int i = 0; i < 10; i++)
-        if(!enqueue(q, i))
+        if (!enqueue(q, i))
             return 1;
 
     for (int i = 0; i < 10; i++) {
         int n = 0;
-        if(!dequeue(q, &n))
+        if (!dequeue(q, &n))
             return 1;
         if (vals[i] != n)
             return 1;
@@ -27,7 +27,7 @@ int launchTests()
     enqueue(q, 30);
 
     int n = 0;
-    if(!dequeue(q, &n) || n != 10)
+    if (!dequeue(q, &n) || n != 10)
         return 1;
 
     enqueue(q, 11);
@@ -43,12 +43,14 @@ int launchTests()
         return 1;
     if (!dequeue(q, &n) || n != 13)
         return 1;
-
     if (dequeue(q, &n))
         return 1;
-    
+
     freeQueue(&q);
-    return q == NULL;
+    if (q != NULL)
+        return 1;
+
+    return 0;
 }
 
 int main()

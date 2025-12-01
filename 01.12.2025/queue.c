@@ -12,6 +12,15 @@ typedef struct Queue {
     ListNode* tailRoot;
 } Queue;
 
+void freeList(ListNode* root)
+{
+    while (root != NULL) {
+        ListNode* p = root->next;
+        free(root);
+        root = p;
+    }
+}
+
 ListNode* makeListNode(int data)
 {
     ListNode* p = malloc(sizeof(*p));
@@ -39,6 +48,8 @@ void freeQueue(Queue** q)
     if (q == NULL || *q == NULL)
         return;
 
+    freeList((*q)->headRoot);
+    freeList((*q)->tailRoot);
     free(*q);
     *q = NULL;
 }
@@ -79,6 +90,8 @@ ListNode* reverseList(ListNode* root)
 
     /* Destroy recursion. */
     root->next = NULL;
+    p->next = newRoot;
+    newRoot = p;
     for (ListNode* pp = newRoot; pp != NULL; pp = pp->next)
         printf("%d ", pp->data);
     return newRoot;
