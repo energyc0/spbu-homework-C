@@ -25,8 +25,11 @@ int binaryCompare(unsigned int a, unsigned int b)
     return 0;
 }
 
-
-
+/*
+ * Launch tests for binaryCompare().
+ * Return 0, if successful,
+ * Return 1, if failed.
+ */
 int launchTests()
 {
     struct {
@@ -59,8 +62,7 @@ int launchTests()
     return returnCode;
 }
 
-int main(int argc, char** argv)
+int main(void)
 {
-    launchTests();
-    return 0;
+    return launchTests();
 }
