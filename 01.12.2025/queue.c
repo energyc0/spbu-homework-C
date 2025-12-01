@@ -1,6 +1,6 @@
 #include "queue.h"
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 typedef struct ListNode {
     int data;
@@ -58,7 +58,7 @@ bool enqueue(Queue* q, int n)
     return true;
 }
 
-ListNode* reverseList (ListNode* root)
+ListNode* reverseList(ListNode* root)
 {
     if (root == NULL)
         return root;
@@ -67,8 +67,7 @@ ListNode* reverseList (ListNode* root)
 
     if (p == NULL)
         return newRoot;
-    ListNode* next = p ->next;
-
+    ListNode* next = p->next;
 
     while (next != NULL) {
         p->next = newRoot;
@@ -102,7 +101,7 @@ bool dequeue(Queue* q, int* n)
         q->tailRoot = reverseList(q->headRoot);
         q->headRoot = NULL;
     }
-    
+
     *n = q->tailRoot->data;
     ListNode* p = q->tailRoot;
     q->tailRoot = q->tailRoot->next;
