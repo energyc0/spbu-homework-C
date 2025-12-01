@@ -13,7 +13,8 @@
 int binaryCompare(unsigned int a, unsigned int b)
 {
     const int totalBits = sizeof(a)*8;
-    for (int bit = 0; bit < totalBits; bit++) {
+    /* Start compate from the biggest byte. */
+    for (int bit = totalBits-1; bit >= 0; bit--) {
         bool hasBitA = (a & (1<<bit));
         bool hasBitB = (b & (1<<bit));
         /* Found the difference */
@@ -34,11 +35,13 @@ int launchTests()
         int expected;
     } testcases[] = {
         {11, 12, -1},
-        {INT_MAX, INT_MAX, 0},
-        {INT_MIN, INT_MIN, 0},
-        {INT_MIN, INT_MAX, -1},
-        {INT_MAX, INT_MIN, 1},
-        {1, 0, 0}
+        {UINT_MAX, UINT_MAX, 0},
+        {0, 0, 0},
+        {0, UINT_MAX, -1},
+        {UINT_MAX, 0, 1},
+        {65, 63, 1},
+        {125, 127, -1},
+        {25,25,0}
     };
     int returnCode = 0;
 
