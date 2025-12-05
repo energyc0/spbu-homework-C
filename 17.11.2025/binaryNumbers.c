@@ -38,7 +38,7 @@ BinaryNumber* binaryNumberAssign(BinaryNumber* binNum, int decNum)
         return binNum;
     }
     for (int bit = BINARY_NUMBER_SIZE - 1; bit >= 0; bit--) {
-        binNum->data[bit] = ((decNum & (1 << (BINARY_NUMBER_SIZE - bit - 1))) ? 1 : 0);
+        binNum->data[bit] = (decNum >> (BINARY_NUMBER_SIZE - bit - 1)) & 1;
     }
 
     return binNum;
@@ -63,9 +63,10 @@ BinaryNumber* binaryNumberAdd(const BinaryNumber* a, const BinaryNumber* b, Bina
 
     int carry = 0;
     for (int bit = BINARY_NUMBER_SIZE - 1; bit >= 0; bit--) {
-        int res = a->data[bit] + b->data[bit] + carry;
-        result->data[bit] = res % 2;
-        carry = res / 2;
+        int A = a->data[bit];
+        int B = b->data[bit];
+        result->data[bit] = A ^ B ^ carry;
+        carry = (A & B) | (carry & (A ^ B));
     }
     return result;
 }
@@ -176,6 +177,9 @@ void binaryCheckAddition(int line, const BinaryCheckAdditionArgs* args, int* ret
     } else {
         eprintDebug(line, returnCode, "Failed to perform addition!\n");
     }
+
+    binaryNumberFree(&binA);
+    binaryNumberFree(&binB);
 }
 
 int binaryNumberRunTests()
