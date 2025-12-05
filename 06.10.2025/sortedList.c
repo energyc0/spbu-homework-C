@@ -34,6 +34,9 @@ SortedList* sortedListAlloc()
 
 void sortedListFree(SortedList** pList)
 {
+    if (pList == NULL || *pList == NULL)
+        return;
+
     ListNode* ptr = (*pList)->_head;
     while (ptr != NULL) {
         ListNode* temp = ptr->next;
@@ -47,6 +50,9 @@ void sortedListFree(SortedList** pList)
 
 bool sortedListInsert(SortedList* pList, int value)
 {
+    if (pList == NULL)
+        return false;
+
     ListNode* newNode = allocListNode(value);
     if (newNode == NULL)
         return false;
@@ -74,7 +80,7 @@ bool sortedListInsert(SortedList* pList, int value)
 
 bool sortedListRemoveIndex(SortedList* pList, int index)
 {
-    if (pList->_head == NULL || index < 0)
+    if (pList == NULL || pList->_head == NULL || index < 0)
         return false;
 
     if (index == 0) {
@@ -101,7 +107,7 @@ bool sortedListRemoveIndex(SortedList* pList, int index)
 
 bool sortedListRemoveValue(SortedList* pList, int value)
 {
-    if (pList->_head == NULL) {
+    if (pList == NULL || pList->_head == NULL) {
         return false;
     } else if (pList->_head->value == value) {
         ListNode* temp = pList->_head;
@@ -126,6 +132,11 @@ bool sortedListRemoveValue(SortedList* pList, int value)
 
 void sortedListPrint(const SortedList* pList)
 {
+    if (pList == NULL) {
+        printf("[NULL]\n");
+        return;
+    }
+
     putchar('[');
 
     for (ListNode* ptr = pList->_head; ptr != NULL; ptr = ptr->next) {
@@ -139,6 +150,8 @@ void sortedListPrint(const SortedList* pList)
 
 bool sortedListGet(const SortedList* pList, int index, int* value)
 {
+    if (pList == NULL)
+        return false;
     ListNode* ptr = pList->_head;
     for (int i = 0; i < index && ptr != NULL; i++, ptr = ptr->next)
         ;
@@ -153,5 +166,5 @@ bool sortedListGet(const SortedList* pList, int index, int* value)
 
 bool isSortedListEmpty(const SortedList* pList)
 {
-    return pList->_head == NULL;
+    return pList != NULL && pList->_head == NULL;
 }
