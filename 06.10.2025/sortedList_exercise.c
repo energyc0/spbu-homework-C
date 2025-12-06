@@ -1,6 +1,7 @@
 #include "sortedList.h"
 #include <ctype.h>
 #include <stdio.h>
+#include <string.h>
 
 #define PROMPT " > "
 
@@ -118,9 +119,25 @@ static bool interactiveSortedList(SortedList* list, char command)
     return true;
 }
 
-int main(void)
+int main(int argc, char** argv)
 {
+#ifdef DEBUG
+    if (argc >= 2) {
+        if (argc > 2 || (argc == 2 && strcmp("--test", argv[1]) != 0)) {
+            fprintf(stderr, "Usage: %s [--test]\n", argv[0]);
+            return 1;
+        }
+        return launchSortedListTesting();
+    }
+#else
+    // unused parameters
+    ((void)argc);
+    ((void)argv);
+#endif
+
     SortedList* pList = sortedListAlloc();
+    if (pList == NULL)
+        return 1;
 
     printHelpInfo();
     while (1) {
