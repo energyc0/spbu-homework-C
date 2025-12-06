@@ -2,3 +2,4 @@ add_executable(binaryRepresentation binaryRepresentation.c)
 add_library(binaryNumbers binaryNumbers.c)
 
 target_link_libraries(binaryRepresentation PRIVATE binaryNumbers)
+add_executable(doubleInternals doubleInternals.c)
